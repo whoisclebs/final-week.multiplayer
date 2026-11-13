@@ -1,0 +1,19 @@
+[package]
+name = "fwm-installer"
+version = "1.0.0"
+edition = "2024"
+description = "Packs and installs the Final Week Multiplayer mod for Finals Week"
+license = "MIT"
+repository = "https://github.com/whoisclebs/final-week.multiplayer"
+publish = false
+
+[dependencies]
+anyhow = "1.0"
+clap = { version = "4.6", features = ["derive"] }
+# Not on crates.io; pinned to a release tag. The `oodle` feature is required to
+# read the game's Oodle-compressed pak.
+repak = { git = "https://github.com/trumank/repak", tag = "v0.2.3", default-features = false, features = ["oodle"] }
+
+[profile.release]
+lto = true
+strip = true

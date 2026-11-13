@@ -1,0 +1,83 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  MOD_PAK: CopyGirls-Windows_FinalWeekMultiplayer_P.pak
+
+jobs:
+  build:
+    name: Check, build and pack
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: installer
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the Windows cross toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gcc-mingw-w64-x86-64
+          rustup target add x86_64-pc-windows-gnu
+
+      - name: Check formatting
+        run: cargo fmt --check
+
+      - name: Lint
+        run: cargo clippy --locked --all-targets -- -D warnings
+
+      - name: Test
+        run: cargo test --locked
+
+      - name: Build the installers
+        run: |
+          cargo build --locked --release --target x86_64-unknown-linux-gnu
+          cargo build --locked --release --target x86_64-pc-windows-gnu
+
+      # The committed asset pak is uncompressed, so packing needs no game files and no Oodle.
+      - name: Pack the mod
+        run: |
+          mkdir -p ../dist
+          target/x86_64-unknown-linux-gnu/release/fwm-installer pack \
+            --from ../assets/BP_GameInstance.pak --players 8 --output "../dist/$MOD_PAK"
+
+      - name: Collect the release files
+        run: |
+          cp target/x86_64-pc-windows-gnu/release/fwm-installer.exe ../dist/
+          cp target/x86_64-unknown-linux-gnu/release/fwm-installer ../dist/fwm-installer-linux
+          (cd ../plugin && zip -qr ../dist/FinalWeekMultiplayer-plugin.zip FinalWeekMultiplayer)
+          cd ../dist && sha256sum -- * > SHA256SUMS.txt && cat SHA256SUMS.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: final-week-multiplayer
+          path: dist/
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: final-week-multiplayer
+          path: dist
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes

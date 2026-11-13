@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0.0",
+	"FriendlyName": "Final Week Multiplayer",
+	"Description": "Cooperative sessions with a configurable player limit, session search and Blueprint events.",
+	"Category": "Gameplay",
+	"CreatedBy": "whoisclebs",
+	"CreatedByURL": "https://github.com/whoisclebs/final-week.multiplayer",
+	"DocsURL": "https://github.com/whoisclebs/final-week.multiplayer#readme",
+	"MarketplaceURL": "",
+	"SupportURL": "https://github.com/whoisclebs/final-week.multiplayer/issues",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "FinalWeekMultiplayer",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
