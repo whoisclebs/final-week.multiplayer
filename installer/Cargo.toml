@@ -1,6 +1,6 @@
 [package]
 name = "fwm-installer"
-version = "1.0.0"
+version = "1.1.0"
 edition = "2024"
 description = "Packs and installs the Final Week Multiplayer mod for Finals Week"
 license = "MIT"
@@ -17,3 +17,7 @@ repak = { git = "https://github.com/trumank/repak", tag = "v0.2.3", default-feat
 [profile.release]
 lto = true
 strip = true
+
+# Swaps the Oodle downloader inside repak for an offline decompressor.
+[patch."https://github.com/trumank/repak"]
+oodle_loader = { path = "oodle-shim" }

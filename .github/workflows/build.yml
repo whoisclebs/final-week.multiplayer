@@ -56,6 +56,8 @@ jobs:
           cp target/x86_64-pc-windows-gnu/release/fwm-installer.exe ../dist/
           cp target/x86_64-unknown-linux-gnu/release/fwm-installer ../dist/fwm-installer-linux
           (cd ../plugin && zip -qr ../dist/FinalWeekMultiplayer-plugin.zip FinalWeekMultiplayer)
+          # Nexus Mods upload: installer only (no game files), extracted into the game folder.
+          (cd ../dist && zip -q FinalWeekMultiplayer-nexus.zip fwm-installer.exe)
           cd ../dist && sha256sum -- * > SHA256SUMS.txt && cat SHA256SUMS.txt
 
       - uses: actions/upload-artifact@v4

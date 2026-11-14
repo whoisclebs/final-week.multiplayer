@@ -1,0 +1,11 @@
+[package]
+# Must keep repak's crate name and version so `[patch]` can replace it.
+name = "oodle_loader"
+version = "0.2.3"
+edition = "2024"
+description = "Offline replacement for repak's oodle_loader backed by oozextract"
+license = "MIT"
+publish = false
+
+[dependencies]
+oozextract = "0.5.7"

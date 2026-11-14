@@ -29,7 +29,7 @@ impl GameInstance {
             .reader(&mut reader)
             .with_context(|| format!("{} is not a supported pak", pak_path.display()))?;
 
-        // The game pak is Oodle-compressed; repak downloads the Oodle library on first use.
+        // The game pak is Oodle-compressed; see oodle-shim for the offline decompressor.
         let mut get = |path: &str| {
             pak.get(path, &mut reader)
                 .with_context(|| format!("cannot read {path} from {}", pak_path.display()))

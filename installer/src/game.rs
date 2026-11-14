@@ -18,13 +18,20 @@ pub struct Game {
 }
 
 impl Game {
-    /// Uses `game_dir` when given, otherwise searches every Steam library.
+    /// Uses `game_dir` when given; otherwise the installer's own folder (when it
+    /// was extracted into the game folder), then every Steam library.
     pub fn locate(game_dir: Option<&Path>) -> Result<Self> {
-        let candidates = match game_dir {
+        let candidates: Vec<PathBuf> = match game_dir {
             Some(dir) => vec![dir.to_path_buf()],
-            None => steam_libraries()
+            None => std::env::current_exe()
+                .ok()
+                .and_then(|exe| exe.parent().map(Path::to_path_buf))
                 .into_iter()
-                .map(|library| library.join("steamapps").join("common").join(INSTALL_DIR))
+                .chain(
+                    steam_libraries()
+                        .into_iter()
+                        .map(|library| library.join("steamapps").join("common").join(INSTALL_DIR)),
+                )
                 .collect(),
         };
 

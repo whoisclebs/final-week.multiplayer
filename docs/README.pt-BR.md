@@ -69,7 +69,7 @@ Os arquivos do jogo nunca são modificados. A Unreal Engine carrega arquivos `_P
 ### Como funciona
 
 1. O instalador encontra o jogo nas suas bibliotecas da Steam.
-2. Ele lê o `BP_GameInstance` de `CopyGirls-Windows.pak`. Esse pak é comprimido com Oodle, então na primeira execução o instalador baixa a biblioteca Oodle (`oo2core_9`) para a pasta dele e confere o SHA-256.
+2. Ele lê o `BP_GameInstance` de `CopyGirls-Windows.pak`. Esse pak é comprimido com Oodle; o instalador o descomprime com o [oozextract](https://github.com/lvlvllvlvllvlvl/oozextract), um descompressor open source, então ele nunca se conecta à internet.
 3. Ele procura no bytecode a chamada `CreateAdvancedSession(PublicConnections, PrivateConnections = 0, …)` e troca `PublicConnections`. A chamada precisa ser encontrada **exatamente uma vez**; caso contrário ele para sem gravar nada, então uma versão desconhecida do jogo nunca é alterada às cegas.
 4. Ele grava `CopyGirls-Windows_FinalWeekMultiplayer_P.pak` em `CopyGirls/Content/Paks`. O arquivo é escrito primeiro em um caminho temporário e só é renomeado quando está completo.
 
@@ -80,6 +80,7 @@ Os arquivos do jogo nunca são modificados. A Unreal Engine carrega arquivos `_P
 * [![Rust][rust-shield]][rust-url]
 * [![Unreal Engine][unreal-shield]][unreal-url]
 * [repak](https://github.com/trumank/repak) para ler e gravar paks da Unreal
+* [oozextract](https://github.com/lvlvllvlvllvlvl/oozextract) para descompressão Oodle
 * [clap](https://github.com/clap-rs/clap) para a linha de comando
 
 <p align="right">(<a href="#readme-top">voltar ao topo</a>)</p>
@@ -97,7 +98,7 @@ Os arquivos do jogo nunca são modificados. A Unreal Engine carrega arquivos `_P
 
 1. Baixe `fwm-installer.exe` (Windows) ou `fwm-installer-linux` da [release mais recente][release-url].
 2. Feche o jogo.
-3. Dê dois cliques em `fwm-installer.exe`. Ele instala o mod com limite de 8 jogadores.
+3. Dê dois cliques em `fwm-installer.exe`. Ele instala o mod com limite de 8 jogadores. Se a Steam estiver numa pasta personalizada, coloque o instalador na pasta do jogo (a que tem o `CopyGirls.exe`) antes.
 
 Para outro limite, execute pelo terminal:
 
@@ -139,7 +140,7 @@ fwm-installer [COMANDO]
 | `pack [--from PAK] [--output ARQUIVO] [--players N]` | Gera o pak do mod sem instalar |
 
 * `--players` aceita de **2 a 64** (padrão **8**).
-* `--game-dir` é a pasta que contém `CopyGirls.exe`. Use quando a Steam não estiver no local padrão.
+* `--game-dir` é a pasta que contém `CopyGirls.exe`. Sem ele, o instalador procura primeiro na própria pasta e depois nas bibliotecas da Steam.
 
 ### Limitações conhecidas
 
@@ -157,6 +158,7 @@ fwm-installer [COMANDO]
 ├── assets/              BP_GameInstance original da versão suportada do jogo
 ├── docs/                READMEs traduzidos
 ├── installer/           Instalador e empacotador em Rust
+│   ├── oodle-shim/      Descompressor Oodle offline usado pelo repak
 │   └── src/
 │       ├── main.rs      Linha de comando
 │       ├── game.rs      Localização da Steam e da pasta do jogo
@@ -188,7 +190,7 @@ fwm-installer pack --players 4 --output assets/BP_GameInstance.pak
 - [x] Instalador com limite de jogadores configurável
 - [x] Pak pronto gerado pelo CI
 - [x] Plugin de sessões para Unreal Engine 5
-- [ ] Ler a pasta da Steam pelo registro do Windows
+- [x] Instalador offline, sem downloads
 - [ ] Confirmar cadeiras e interface com mais de 4 jogadores
 
 Veja as [issues abertas][issues-url] para a lista completa de recursos propostos e problemas conhecidos.
